@@ -81,8 +81,19 @@ def set_value(
     profile = config.get_profile(ctx.profile_name)
     if key in {"api_base", "local_api_url"}:
         cleaned = value.strip().rstrip("/")
-        parsed = urlsplit(cleaned)
-        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        try:
+            parsed = urlsplit(cleaned)
+            hostname = parsed.hostname
+            port = parsed.port
+            is_valid = (
+                parsed.scheme in {"http", "https"}
+                and bool(hostname)
+                and (port is None or 1 <= port <= 65535)
+            )
+        except (ValueError, TypeError):
+            is_valid = False
+
+        if not is_valid:
             raise UsageError(
                 message=f"Invalid URL for '{key}'",
                 detail=f"'{key}' must be an http:// or https:// URL with a valid host (got '{value}').",
