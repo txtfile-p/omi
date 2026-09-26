@@ -646,6 +646,11 @@ def test_profile_invalid_field_config_show_and_diagnostics_succeed(config_path: 
         "https://",
         "javascript:alert(1)",
         "   ",
+        "http://[",
+        "http://:47778",
+        "http://example.test:abc",
+        "https://example.test:65536",
+        "https://example.test:0",
     ],
 )
 def test_config_set_rejects_invalid_urls(config_path: Path, cli_runner, key: str, invalid_url: str) -> None:
